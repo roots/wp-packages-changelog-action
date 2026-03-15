@@ -3,7 +3,7 @@
 [![Follow Roots](https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square)](https://twitter.com/rootswp)
 [![Sponsor Roots](https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=)](https://github.com/sponsors/roots)
 
-Automatically comment WordPress plugin changelogs on pull requests when WP Composer dependencies change in your `composer.lock` or `composer.json` files.
+Automatically comment WordPress plugin changelogs on pull requests when [WP Composer](https://wp-composer.com/) dependencies change in your `composer.lock` or `composer.json` files.
 
 ## Support us
 
@@ -11,7 +11,7 @@ We're dedicated to pushing modern WordPress development forward through our open
 
 ## Features
 
-- Detects changes to WP Composer plugins in both `composer.lock` and `composer.json`
+- Detects changes to [WP Composer](https://wp-composer.com/) plugins in both `composer.lock` and `composer.json`
 - Fetches changelogs from WordPress.org API
 - Warns about unstable versions when installed version > WP.org's stable tag for the plugin
 
