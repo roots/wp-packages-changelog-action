@@ -1,5 +1,5 @@
-name: 'WPackagist Changelog Action'
-description: 'Automatically comment WordPress plugin changelogs on pull requests when WPackagist dependencies change'
+name: 'WP Composer Changelog Action'
+description: 'Automatically comment WordPress plugin changelogs on pull requests when WP Composer dependencies change'
 author: 'Roots Software LLC'
 branding:
   icon: 'package'
@@ -30,7 +30,7 @@ runs:
       with:
         github-token: ${{ inputs.token }}
         script: |
-          const MARKER = '<!-- wpackagist-changelog-bot -->';
+          const MARKER = '<!-- wp-composer-changelog-bot -->';
           let pluginsMap = new Map();
 
           let page = 1;
@@ -52,17 +52,17 @@ runs:
                 composerLockContent = f.patch;
                 const addedLines = f.patch.split('\n').filter(line => line.startsWith('+'));
                 const addedContent = addedLines.join('\n');
-                const matches = addedContent.match(/wpackagist-plugin\/([a-z0-9\-]+)/gi) || [];
+                const matches = addedContent.match(/wp-plugin\/([a-z0-9\-]+)/gi) || [];
                 matches.forEach(m => {
-                  const pluginName = m.toLowerCase().replace('wpackagist-plugin/', '');
+                  const pluginName = m.toLowerCase().replace('wp-plugin/', '');
                   pluginsMap.set(pluginName, null);
                 });
               } else if (f.filename === 'composer.json' && f.patch) {
                 const addedLines = f.patch.split('\n').filter(line => line.startsWith('+'));
                 const addedContent = addedLines.join('\n');
-                const matches = addedContent.match(/wpackagist-plugin\/([a-z0-9\-]+)/gi) || [];
+                const matches = addedContent.match(/wp-plugin\/([a-z0-9\-]+)/gi) || [];
                 matches.forEach(m => {
-                  const pluginName = m.toLowerCase().replace('wpackagist-plugin/', '');
+                  const pluginName = m.toLowerCase().replace('wp-plugin/', '');
                   pluginsMap.set(pluginName, null);
                 });
               }
@@ -76,8 +76,8 @@ runs:
             let currentPlugin = null;
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
-              if (line.includes('"name": "wpackagist-plugin/')) {
-                const match = line.match(/"wpackagist-plugin\/([^"]+)"/);
+              if (line.includes('"name": "wp-plugin/')) {
+                const match = line.match(/"wp-plugin\/([^"]+)"/);
                 if (match) {
                   currentPlugin = match[1];
                 }
@@ -94,7 +94,7 @@ runs:
           const plugins = [...pluginsMap.keys()].sort();
 
           if (plugins.length === 0) {
-            console.log('No WPackagist plugins changed');
+            console.log('No WP Composer plugins changed');
             return;
           }
 
@@ -179,7 +179,7 @@ runs:
                 if (compareVersions(installedVersion, stableTag) > 0) {
                   versionWarning = `> ⚠️ **Warning:** Installing version ${installedVersion} but stable tag is ${stableTag}. ` +
                     `This may be an unstable version. ` +
-                    `[Learn more](https://github.com/outlandishideas/wpackagist/issues/547)\n\n`;
+                    `\n\n`;
                 }
               }
 

@@ -1,4 +1,4 @@
-name: WPackagist Changelog
+name: WP Composer Changelog
 
 on:
   pull_request:
@@ -13,4 +13,4 @@ jobs:
       pull-requests: write
     steps:
       - name: Comment changelogs on PR
-        uses: roots/wpackagist-changelog-action@v1
+        uses: roots/wp-composer-changelog-action@v1

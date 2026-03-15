@@ -1,9 +1,9 @@
-# WPackagist Changelog Action
+# WP Composer Changelog Action
 
 [![Follow Roots](https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square)](https://twitter.com/rootswp)
 [![Sponsor Roots](https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=)](https://github.com/sponsors/roots)
 
-Automatically comment WordPress plugin changelogs on pull requests when WPackagist dependencies change in your `composer.lock` or `composer.json` files.
+Automatically comment WordPress plugin changelogs on pull requests when WP Composer dependencies change in your `composer.lock` or `composer.json` files.
 
 ## Support us
 
@@ -11,7 +11,7 @@ We're dedicated to pushing modern WordPress development forward through our open
 
 ## Features
 
-- Detects changes to WPackagist plugins in both `composer.lock` and `composer.json`
+- Detects changes to WP Composer plugins in both `composer.lock` and `composer.json`
 - Fetches changelogs from WordPress.org API
 - Warns about unstable versions when installed version > WP.org's stable tag for the plugin
 
@@ -19,10 +19,10 @@ We're dedicated to pushing modern WordPress development forward through our open
 
 ### Basic Setup
 
-Create a workflow file in your repository (e.g., `.github/workflows/wpackagist-changelog.yml`):
+Create a workflow file in your repository (e.g., `.github/workflows/wp-composer-changelog.yml`):
 
 ```yaml
-name: WPackagist Changelog
+name: WP Composer Changelog
 
 on:
   pull_request:
@@ -37,7 +37,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Comment changelogs on PR
-        uses: roots/wpackagist-changelog-action@v1
+        uses: roots/wp-composer-changelog-action@v1
 ```
 
 ## Example Comment
@@ -48,7 +48,7 @@ The action creates a formatted comment like this:
 >
 > ## woocommerce (v10.2.0)
 >
-> > ⚠️ **Warning:** Installing version 10.2.0 but stable tag is 10.1.2. This may be an unstable version. [Learn more](https://github.com/outlandishideas/wpackagist/issues/547)
+> > ⚠️ **Warning:** Installing version 10.2.0 but stable tag is 10.1.2. This may be an unstable version.
 >
 > <details>
 > <summary>View changelog</summary>
