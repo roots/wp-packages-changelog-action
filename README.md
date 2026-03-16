@@ -37,7 +37,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Comment changelogs on PR
-        uses: roots/wp-composer-changelog-action@v1
+        uses: roots/wp-composer-changelog-action@v2
 ```
 
 ## Example Comment
