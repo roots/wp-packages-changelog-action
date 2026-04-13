@@ -84,30 +84,85 @@ runs:
             getComposerLock(pr.head.sha),
           ]);
 
-          // null = fetch/parse error; missing file (404) returns null without a warning
-          // Only proceed if we don't have warnings about failures
           if (fetchWarnings.length > 0) {
             console.log(`Warnings: ${fetchWarnings.join('; ')}`);
           }
 
-          const getPluginVersions = (lock) => {
-            const map = new Map();
-            if (!lock) return map;
-            for (const pkg of lock.packages || []) {
-              if (pkg.name?.startsWith('wp-plugin/')) {
-                map.set(pkg.name.replace('wp-plugin/', ''), pkg.version);
+          if (baseLock && headLock) {
+            // Full JSON comparison — accurate detection of all changed plugins
+            const getPluginVersions = (lock) => {
+              const map = new Map();
+              for (const pkg of lock.packages || []) {
+                if (pkg.name?.startsWith('wp-plugin/')) {
+                  map.set(pkg.name.replace('wp-plugin/', ''), pkg.version);
+                }
+              }
+              return map;
+            };
+
+            const baseVersions = getPluginVersions(baseLock);
+            const headVersions = getPluginVersions(headLock);
+
+            for (const [name, headVersion] of headVersions) {
+              const baseVersion = baseVersions.get(name);
+              if (baseVersion !== headVersion) {
+                pluginsMap.set(name, headVersion);
               }
             }
-            return map;
-          };
+          } else {
+            // Fallback: parse the diff patch (may miss plugins whose name line
+            // is unchanged context in the diff, but works without contents: read)
+            console.log('Falling back to diff-based detection');
+            fetchWarnings = [`Using diff-based detection (some updated plugins may not be listed). For full accuracy, add \`contents: read\` to your workflow permissions.`];
 
-          const baseVersions = getPluginVersions(baseLock);
-          const headVersions = getPluginVersions(headLock);
+            let page = 1;
+            const per_page = 100;
+            let composerLockPatch = null;
 
-          for (const [name, headVersion] of headVersions) {
-            const baseVersion = baseVersions.get(name);
-            if (baseVersion !== headVersion) {
-              pluginsMap.set(name, headVersion);
+            while (true) {
+              const { data: files } = await github.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                per_page,
+                page,
+              });
+              if (!files.length) break;
+
+              for (const f of files) {
+                if (f.filename === 'composer.lock' && f.patch) {
+                  composerLockPatch = f.patch;
+                  const addedLines = f.patch.split('\n').filter(line => line.startsWith('+'));
+                  const addedContent = addedLines.join('\n');
+                  const matches = addedContent.match(/wp-plugin\/([a-z0-9\-]+)/gi) || [];
+                  matches.forEach(m => {
+                    const pluginName = m.toLowerCase().replace('wp-plugin/', '');
+                    pluginsMap.set(pluginName, null);
+                  });
+                }
+              }
+              if (files.length < per_page) break;
+              page += 1;
+            }
+
+            if (composerLockPatch) {
+              const lines = composerLockPatch.split('\n');
+              let currentPlugin = null;
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.includes('"name": "wp-plugin/')) {
+                  const match = line.match(/"wp-plugin\/([^"]+)"/);
+                  if (match) {
+                    currentPlugin = match[1];
+                  }
+                } else if (currentPlugin && line.includes('"version":')) {
+                  const versionMatch = line.match(/"version":\s*"([^"]+)"/);
+                  if (versionMatch && pluginsMap.has(currentPlugin)) {
+                    pluginsMap.set(currentPlugin, versionMatch[1]);
+                  }
+                  currentPlugin = null;
+                }
+              }
             }
           }
 
