@@ -33,6 +33,7 @@ jobs:
   changelog:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: Comment changelogs on PR
