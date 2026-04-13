@@ -3,7 +3,7 @@
 [![Follow Roots](https://img.shields.io/badge/follow%20@rootswp-1da1f2?logo=twitter&logoColor=ffffff&message=&style=flat-square)](https://twitter.com/rootswp)
 [![Sponsor Roots](https://img.shields.io/badge/sponsor%20roots-525ddc?logo=github&style=flat-square&logoColor=ffffff&message=)](https://github.com/sponsors/roots)
 
-Automatically comment WordPress plugin changelogs on pull requests when [WP Packages](https://wp-packages.org/) dependencies change in your `composer.lock` or `composer.json` files.
+Automatically comment WordPress plugin changelogs on pull requests when [WP Packages](https://wp-packages.org/) dependencies change in your `composer.lock`.
 
 ## Support us
 
@@ -11,7 +11,7 @@ Roots is an independent open source org, supported only by developers like you. 
 
 ## Features
 
-- Detects changes to [WP Packages](https://wp-packages.org/) plugins in both `composer.lock` and `composer.json`
+- Detects changes to [WP Packages](https://wp-packages.org/) plugins in `composer.lock`
 - Fetches changelogs from WordPress.org API
 - Warns about unstable versions when installed version > WP.org's stable tag for the plugin
 
@@ -28,12 +28,12 @@ on:
   pull_request:
     paths:
       - 'composer.lock'
-      - 'composer.json'
 
 jobs:
   changelog:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: Comment changelogs on PR
